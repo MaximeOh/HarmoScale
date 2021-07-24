@@ -1,0 +1,3 @@
+# Ignore dev lib
+/js/_*.js
+/css/_*.css

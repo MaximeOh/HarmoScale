@@ -1,0 +1,27 @@
+.scale {}
+
+.scale-version.activeMode {background-color: #dedede;}
+.scale-version .tile-actions {background-color: #fff;}
+.scale-version .tile-actions.chordFound {border-right: 3px solid #5755d9;}
+
+.scale-version:hover {background-color: #efefef;}
+
+.vf-stem {display: none;}
+
+.schema-interval { display: inline-block; padding:2px 5px; }
+.schema-interval-space { font-weight: bold;  display: inline-block; margin: 0px;}
+
+.schema-H:before { position: relative; content:'½'; }
+.schema-WH:before { position: relative; content:'1½'; }
+.schema-W:before { position: relative; content:'1'; }
+
+g.currentNotePlayed  { filter: opacity(0.2); }
+
+dd.currentNotePlayed  { color: red;}
+
+.border {border: .05rem solid #dadee4}
+.border-left {border-left: .05rem solid #dadee4}
+.border-top {border-top: .05rem solid #dadee4}
+.border-bottom {border-bottom: .05rem solid #dadee4}
+.border-right {border-right: .05rem solid #dadee4}
+

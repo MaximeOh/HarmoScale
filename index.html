@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>HarmoScale</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/template7/1.4.1/template7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vexflow/3.0.9/vexflow-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/meenie/band.js@8244081578e5d4711102b7b2cf574774de17be1b/dist/band.min.js"></script>
+  <script src="./js/scale.js"></script>
+  <script src="./js/harmo.js"></script>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css" media="print" onload="this.media='all'; this.onload = null;" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css" media="print" onload="this.media='all'; this.onload = null;" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css"  media="print" onload="this.media='all'; this.onload = null;" />
+
+	<link rel="stylesheet" href="./css/style.css" media="print" onload="this.media='all'; this.onload = null;">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<div id="header">
+
+		<div class="column col-12 ">
+			<div class="card my-2 ">
+				<div class="card-header">
+					<div class="columns card-title">
+						<div class="column">
+							<h1>HarmoScale</h1>
+						</div>
+						<div class="column">
+							<a href="#modal-about">A propos</a>
+							<div class="modal" id="modal-about">
+								<a href="#close" class="modal-overlay" aria-label="Close"></a>
+								<div class="modal-container">
+									<div class="modal-header">
+										<a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+										<div class="modal-title h5">A propos</div>
+									</div>
+									<div class="modal-body">
+										<div class="content">
+											<p>Harmo Scale est un outil de visualisation des différentes gammes utilisées en Jazz et des modes dérivés.</p>
+											<span>Il est possible de :</span>
+											<ul>
+												<li>définir la note de départ de la gamme.</li>
+												<li>basculer entre les différents modes.</li>
+												<li>chercher une gamme et un mode à partir d'un accord.</li>
+												<li>jouer la gamme pour un instrument donné (UT, Bb, Eb).</li>
+											</ul>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<p>Développé par Maxime Ohayon</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-body px-2 py-2">
+					<div class="input-group">
+						<span class="input-group-addon">Tune </span>
+						<select id="selectTune" class="form-select column">
+							<option value="-2">Bb (Trumpet) -2</option>
+							<option value="0">Normal</option>
+							<option value="+3">Eb (Sax) +3</option>
+						</select>
+					</div>
+					<div class="columns mt-2 mx-0 border">
+						<div class="column bg-gray col-auto text-center">
+							<span class=""><i class="icon icon-search"></i>
+							<br>Find a chord</span>
+						</div>
+						<div id="chordsFinderContainer" class="column form-group py-2 text-tiny">
+							<label class="form-radio form-inline">
+			    			<input type="radio" name="chordToFind" checked="checked"><i class="form-icon"></i> Aucun
+			  			</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="scalesContainer" class="container col-gapless">
+	</div>
+
+	<script id="templateChordsFinder" type="text/template7">
+		<label class="form-radio form-inline">
+    	<input type="radio" name="chordToFind" value="{{chord}}"><i class="form-icon"></i> <span class="badge" data-badge="{{used}}">{{chord}}</span>
+  	</label>
+	</script>
+	<script id="templateScale" type="text/template7">
+		<div id="scale-{{scaleKey}}" class="scale col-12 my-2">
+			<div class="card">
+				<div class="card-header bg-gray">
+					<div class="columns card-title">
+						<div class="form-group">
+						<select class="form-select" id="selectStartNote-{{scaleKey}}">
+							{{#each chromaticNotes}}
+								<option value="{{this}}">{{this}}</option>
+							{{/each}}
+						</select>
+						</div>
+						<div class="h3 px-1">{{scaleName}}</div>
+					</div>
+					<dl class="text-large">
+						<dt class="schema-interval-space pr-2">Schéma</dt>
+						<dd id="schema-note-{{scaleKey}}-0" class="schema-interval-space">-</dd>
+						{{# each scaleSchema}}
+						<dt class="schema-interval schema-{{this}}"></dt>
+						<dd id="schema-note-{{../scaleKey}}-{{js "this.@index + 1"}}" class="schema-interval-space">-</dd>
+						{{/each}}
+					</dl>
+				</div>
+				<div class="card-image">
+				</div>
+				<div class="card-body">
+					<div class="columns">
+						<div class="column col-lg-12 col-6">
+							<div id="score-{{scaleKey}}" class="score">
+							</div>
+						</div>
+						<div class="column col-lg-12 col-6">
+							<div class="scale-versions">
+								{{#each versions}}
+									<div data-version-index="{{vIndex}}" class="scale-version-{{vScaleKey}} scale-version tile tile-centered c-hand {{#js_if "this.vIndex === this.vActiveVersion"}}activeMode{{/js_if}}">
+									<div class="tile-content">
+										{{vIndex}}. {{vName}}
+									</div>
+									<div class="tile-actions">
+										{{#each vChords}}
+										<span class="label label-secondary" data-chord="{{this}}">{{this}}</span>
+										{{/each}}
+									</div>
+								</div>
+								{{/each}}
+							</div>
+					</div>
+				</div>
+				<div class="card-footer">
+					<button id="play-{{scaleKey}}" class="play btn">Play</button>
+	    		<label id="currentPlayedNote-{{scaleKey}}">-</label>
+	  		</div>
+	  	</div>
+		</div>
+	</script>
+</body>
+</html>
